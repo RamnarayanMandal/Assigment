@@ -17,30 +17,17 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    image: {
-        type: String,
-    },
-    phoneNo: {
-        type: Number,
-    },
-    title: {
-        type: String
-    },
-    bio:{
-        type: String,
-        
-    },
-    address: {
-        type: String
-    },
-    socialMedia: [{
-        name: {
-            type: String
-        },
-        url: {
-            type: String
+    DOB:{
+        type: Date,
+        required: [true, 'Date of Birth is required'],
+        validate: {
+            validator: function(value) {
+                return new Date() - value > 0;
+            },
+            message: 'Date of Birth should be in the past'
         }
-    }]
+    }
+    
 }, { timestamps: true });
 
 userSchema.pre('save', async function(next) {
@@ -51,7 +38,6 @@ userSchema.pre('save', async function(next) {
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
     
-    // Log the hashed password before saving
     console.log('Hashed password before saving:', this.password);
     
     next();
